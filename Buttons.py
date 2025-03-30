@@ -13,17 +13,17 @@ class Buttons:
         self.timer = timer
 
     def create_buttons(self):
-        self.analog_button = self.create_button(-150, -250, "Зміна формату годинника", self.switch_watch)
-        self.exit_button = self.create_button(150, -250, "Закрити програму", self.exit_program)
-        self.change_format = self.create_button(-150, -300, "Змінити 12/24", self.change)
-        self.timer_button = self.create_button(150, -300, "Встановити таймер на 10 сек", self.start_timer)
+        self.analog_button = self.create_button(-200, -250, "Зміна формату годинника", self.switch_watch)
+        self.exit_button = self.create_button(200, -250, "Закрити програму", self.exit_program)
+        self.change_format = self.create_button(-200, -300, "Змінити 12/24", self.change)
+        self.timer_button = self.create_button(200, -300, "Встановити таймер на 10 сек", self.start_timer)
 
     def create_button(self, x, y, text, action):
         hitbox = Turtle()
         hitbox.penup()
         hitbox.goto(x, y)
         hitbox.shape("square")
-        hitbox.shapesize(stretch_wid=2, stretch_len=13)
+        hitbox.shapesize(stretch_wid=2, stretch_len=15.5)
         hitbox.pensize(2)
         hitbox.pencolor("black")
         hitbox.fillcolor("")
