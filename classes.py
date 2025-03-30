@@ -1,6 +1,12 @@
+from time import strftime
 from turtle import *
 from math import *
 import time
+# import tkinter as tk   # Для кнопок
+
+class Watch:
+    def show_time(self):
+        pass
 
 class Number:
     def __init__(self, n, x, y):
@@ -55,7 +61,7 @@ class Hand:
     def clear(self):
         self.h.clear()
 
-class AnalogWatch:
+class AnalogWatch(Watch):
     def __init__(self, size):
         self.sec = Hand(0.8 * size, 2, 'black')
         self.min = Hand(0.7 * size, 4, 'black')
@@ -82,6 +88,27 @@ class AnalogWatch:
         self.update_time()
         ontimer(self.show_time, 1000)
 
+class DigitalWatch(Watch):  # Треба прибрати Цифровий годинник і реалізувати його показ кнопкою
+    def __init__(self):
+        self.screen = Screen()
+        self.screen.title("Digital Clock")
+
+        self.pen = Turtle()
+        self.pen.hideturtle()
+        self.pen.color("green")
+        self.pen.penup()
+        self.pen.goto(0, 0)
+
+    def update_time(self):
+        self.pen.undo()
+        current_time = strftime("%H:%M:%S")
+        self.pen.write(current_time, align="center", font=("Courier", 40, "bold"))
+        self.screen.ontimer(self.update_time, 1000)
+
+    def show_time(self):
+        self.update_time()
+        self.screen.mainloop()
+
 if __name__ == '__main__':
     reset()
     speed(0)
@@ -89,5 +116,7 @@ if __name__ == '__main__':
     c = ClockFace(200)
     c.draw()
     watch = AnalogWatch(200)
+    watch.show_time()
+    watch = DigitalWatch()
     watch.show_time()
     mainloop()
