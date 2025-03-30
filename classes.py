@@ -3,6 +3,7 @@ from turtle import *
 from math import *
 import time
 from Buttons import Buttons
+from Timer import Timer
 
 class Watch:
     def show_time(self):
@@ -150,6 +151,7 @@ if __name__ == '__main__':
     hideturtle()
     analog_watch = AnalogWatch(200)
     digital_watch = DigitalWatch()
-    buttons = Buttons(analog_watch, digital_watch)
+    timer = Timer()
+    buttons = Buttons(analog_watch, digital_watch, timer)
     analog_watch.show_time()
     mainloop()

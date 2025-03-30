@@ -1,12 +1,11 @@
 from turtle import *
 import time
 
-
 class Timer:
     def __init__(self):
-        self.screen = Screen()
-        self.screen.title("Таймер")
-        self.screen.tracer(0)
+        self.window = Screen()
+        self.window.title("Таймер")
+        self.window.setup(width=800, height=800)
 
         self.display = Turtle()
         self.display.hideturtle()
@@ -15,56 +14,34 @@ class Timer:
 
         self.remaining_seconds = 0
         self.is_running = False
+        self.callback = None
 
-        self.setup_timer()
-
-    def setup_timer(self):
+    def start_timer(self, seconds, callback):
+        self.remaining_seconds = int(seconds)
+        self.is_running = True
+        self.callback = callback
         self.display.clear()
-        self.display.write("Встановлення таймера...",
-                           align="center", font=("Courier", 16, "normal"))
-        self.screen.update()
-
-        seconds = self.screen.numinput("Таймер",
-                                       "Введіть кількість секунд (1-3600):",
-                                       default=10, minval=1, maxval=3600)
-
-        if seconds:
-            self.remaining_seconds = int(seconds)
-            self.start_timer()
-        else:
-            self.display.clear()
-            self.display.write("Таймер скасовано",
-                               align="center", font=("Courier", 16, "normal"))
-            self.screen.update()
+        self.countdown()
 
     def update_display(self):
         self.display.clear()
         mins, secs = divmod(self.remaining_seconds, 60)
         time_str = f"{mins:02d}:{secs:02d}"
         self.display.write(time_str, align="center", font=("Courier", 48, "bold"))
-        self.screen.update()
-
-    def start_timer(self):
-        self.is_running = True
-        self.countdown()
 
     def countdown(self):
-        while self.remaining_seconds > 0 and self.is_running:
+        if self.remaining_seconds > -1 and self.is_running:
             self.update_display()
-            time.sleep(1)
             self.remaining_seconds -= 1
-
-        if self.remaining_seconds <= 0:
+            self.window.ontimer(self.countdown, 1000)
+        else:
             self.display.clear()
-            self.display.write("Час вийшов!",
-                               align="center", font=("Courier", 36, "bold"))
-            self.screen.update()
+            time.sleep(1)
             self.is_running = False
+            self.clear()
+            if self.callback:
+                self.callback()
 
-    def run(self):
-        self.screen.mainloop()
-
-
-if __name__ == "__main__":
-    timer = Timer()
-    timer.run()
+    def clear(self):
+        self.display.clear()
+        self.is_running = False
