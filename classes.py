@@ -19,7 +19,7 @@ class Number:
     def draw(self):
         penup()
         goto(self.x, self.y)
-        write(self.n, move=False, align="left", font=("Arial", 24, "bold"))
+        write(self.n, move=False, align="left", font=("Courier", 24, "bold"))
 
 class AnalogWatch(Watch):
     def __init__(self, size):
@@ -163,7 +163,7 @@ class Buttons:
         button.hideturtle()
         button.penup()
         button.goto(x, y - 10)
-        button.write(text, align="center", font=("Arial", 14, "bold"))
+        button.write(text, align="center", font=("Courier", 14, "bold"))
         button.onclick(action)
         return button
 
