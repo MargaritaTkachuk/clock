@@ -13,7 +13,6 @@ class Number:
         goto(self.x, self.y)
         write(self.n, move=False, align="left", font=("Impact", 22, "bold"))
 
-
 class ClockFace:
     def __init__(self, r):
         self.numbers = []
@@ -34,7 +33,6 @@ class ClockFace:
         circle(self.r)
         for n in self.numbers:
             n.draw()
-
 
 class Hand:
     def __init__(self, lent, wid, col):
@@ -67,33 +65,29 @@ class AnalogWatch:
         self.hands.speed(0)
         tracer(0)
 
+    def update_time(self):
+        self.sec.clear()
+        self.min.clear()
+        self.hour.clear()
+        now = time.localtime()
+        sec_angle = now.tm_sec * 6
+        min_angle = now.tm_min * 6 + now.tm_sec * 0.1
+        hour_angle = (now.tm_hour % 12) * 30 + now.tm_min * 0.5
+        self.sec.draw(sec_angle)
+        self.min.draw(min_angle)
+        self.hour.draw(hour_angle)
+        update()
+
     def show_time(self):
-        while True:
-            self.sec.clear()
-            self.min.clear()
-            self.hour.clear()
-            now = time.localtime()
-            sec_angle = now.tm_sec * 6
-            min_angle = now.tm_min * 6 + now.tm_sec * 0.1
-            hour_angle = (now.tm_hour % 12) * 30 + now.tm_min * 0.5
-            self.sec.draw(sec_angle)
-            self.min.draw(min_angle)
-            self.hour.draw(hour_angle)
-            update()
-            time.sleep(1)
-
-
+        self.update_time()
+        ontimer(self.show_time, 1000)
 
 if __name__ == '__main__':
     reset()
     speed(0)
     hideturtle()
-    # number = Number(666, 0, 0)
-    # number.draw()
     c = ClockFace(200)
     c.draw()
     watch = AnalogWatch(200)
     watch.show_time()
     mainloop()
-
-
