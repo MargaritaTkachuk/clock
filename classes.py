@@ -7,6 +7,9 @@ class Watch:
     def show_time(self):
         pass
 
+    def stop_time(self):
+        pass
+
 class Number:
     def __init__(self, n, x, y):
         self.n = n
@@ -17,11 +20,6 @@ class Number:
         penup()
         goto(self.x, self.y)
         write(self.n, move=False, align="left", font=("Arial", 24, "bold"))
-
-    def clear(self):
-        penup()
-        goto(self.x, self.y)
-        clear()
 
 class AnalogWatch(Watch):
     def __init__(self, size):
@@ -34,6 +32,8 @@ class AnalogWatch(Watch):
         self.hands = Turtle()
         self.hands.hideturtle()
         self.hands.speed(0)
+        self.timer = None
+        self.active = False
         tracer(0)
 
     def generate_numbers(self):
@@ -52,6 +52,8 @@ class AnalogWatch(Watch):
             n.draw()
 
     def update_time(self):
+        if not self.active:
+            return
         self.sec.clear()
         self.min.clear()
         self.hour.clear()
@@ -63,17 +65,25 @@ class AnalogWatch(Watch):
         self.min.draw(min_angle)
         self.hour.draw(hour_angle)
         update()
+        self.timer = ontimer(self.update_time, 1000)
 
     def show_time(self):
-        self.draw_clock_face()  # Draw the clock face
+        self.active = True
+        self.draw_clock_face()
         self.update_time()
-        ontimer(self.show_time, 1000)
+
+    def stop_time(self):
+        self.active = False
+        if self.timer:
+            ontimer(None, self.timer)
+            self.timer = None
 
     def clear(self):
-        penup()
-        goto(10, -self.r + 10)
-        pendown()
-        clear()  # Clear the whole analog clock
+        self.stop_time()
+        clear()
+        self.sec.clear()
+        self.min.clear()
+        self.hour.clear()
 
 class Hand:
     def __init__(self, lent, wid, col):
@@ -96,33 +106,86 @@ class Hand:
     def clear(self):
         self.h.clear()
 
-class DigitalWatch(Watch):  # Треба прибрати Цифровий годинник і реалізувати його показ кнопкою
+class DigitalWatch(Watch):
     def __init__(self):
-        self.screen = Screen()
-        self.screen.title("Digital Clock")
-
         self.pen = Turtle()
         self.pen.hideturtle()
         self.pen.color("green")
         self.pen.penup()
         self.pen.goto(0, 0)
+        self.timer = None
+        self.active = False
 
     def update_time(self):
-        self.pen.undo()
+        if not self.active:
+            return
+        self.pen.clear()
         current_time = strftime("%H:%M:%S")
         self.pen.write(current_time, align="center", font=("Courier", 40, "bold"))
-        self.screen.ontimer(self.update_time, 1000)
+        self.timer = ontimer(self.update_time, 1000)
 
     def show_time(self):
+        self.active = True
         self.update_time()
-        self.screen.mainloop()
+
+    def stop_time(self):
+        self.active = False
+        if self.timer:
+            ontimer(None, self.timer)
+            self.timer = None
+
+    def clear(self):
+        self.stop_time()
+        self.pen.clear()
+
+class Buttons:
+    def __init__(self, analog_watch, digital_watch):
+        self.analog_watch = analog_watch
+        self.digital_watch = digital_watch
+        self.is_analog = True
+        self.create_buttons()
+
+    def create_buttons(self):
+        self.analog_button = self.create_button(-150, -250, "Зміна формату годинника", self.switch_watch)
+        self.exit_button = self.create_button(150, -250, "Закрити програму", self.exit_program)
+
+    def create_button(self, x, y, text, action):
+        hitbox = Turtle()
+        hitbox.penup()
+        hitbox.goto(x, y)
+        hitbox.shape("square")
+        hitbox.shapesize(stretch_wid=2, stretch_len=13)
+        hitbox.pensize(2)
+        hitbox.pencolor("black")
+        hitbox.fillcolor("")
+        hitbox.onclick(action)
+        button = Turtle()
+        button.hideturtle()
+        button.penup()
+        button.goto(x, y - 10)
+        button.write(text, align="center", font=("Arial", 14, "bold"))
+        button.onclick(action)
+        return button
+
+    def switch_watch(self, x, y):
+        if self.is_analog:
+            self.analog_watch.clear()
+            self.analog_watch.stop_time()
+            self.digital_watch.show_time()
+        else:
+            self.digital_watch.clear()
+            self.digital_watch.stop_time()
+            self.analog_watch.show_time()
+        self.is_analog = not self.is_analog
+
+    def exit_program(self, x, y):
+        bye()
 
 if __name__ == '__main__':
-    reset()
     speed(0)
     hideturtle()
-    watch = AnalogWatch(200)
-    watch.show_time()
-    watch = DigitalWatch()
-    watch.show_time()
+    analog_watch = AnalogWatch(200)
+    digital_watch = DigitalWatch()
+    buttons = Buttons(analog_watch, digital_watch)
+    analog_watch.show_time()
     mainloop()
