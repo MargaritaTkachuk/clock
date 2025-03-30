@@ -2,6 +2,8 @@ from time import strftime
 from turtle import *
 from math import *
 import time
+from Buttons import Buttons
+from Timer import Timer
 
 class Watch:
     def show_time(self):
@@ -19,7 +21,7 @@ class Number:
     def draw(self):
         penup()
         goto(self.x, self.y)
-        write(self.n, move=False, align="left", font=("Arial", 24, "bold"))
+        write(self.n, move=False, align="left", font=("Courier", 24, "bold"))
 
 class AnalogWatch(Watch):
     def __init__(self, size):
@@ -115,14 +117,19 @@ class DigitalWatch(Watch):
         self.pen.goto(0, 0)
         self.timer = None
         self.active = False
+        self.is_24_hour_format = True
 
     def update_time(self):
         if not self.active:
             return
         self.pen.clear()
-        current_time = strftime("%H:%M:%S")
+        current_time = strftime("%H:%M:%S") if self.is_24_hour_format else strftime("%I:%M:%S %p")
         self.pen.write(current_time, align="center", font=("Courier", 40, "bold"))
         self.timer = ontimer(self.update_time, 1000)
+
+    def toggle_format(self, x=None, y=None):
+        self.is_24_hour_format = not self.is_24_hour_format
+        self.update_time()
 
     def show_time(self):
         self.active = True
@@ -138,54 +145,13 @@ class DigitalWatch(Watch):
         self.stop_time()
         self.pen.clear()
 
-class Buttons:
-    def __init__(self, analog_watch, digital_watch):
-        self.analog_watch = analog_watch
-        self.digital_watch = digital_watch
-        self.is_analog = True
-        self.create_buttons()
-
-    def create_buttons(self):
-        self.analog_button = self.create_button(-150, -250, "Зміна формату годинника", self.switch_watch)
-        self.exit_button = self.create_button(150, -250, "Закрити програму", self.exit_program)
-
-    def create_button(self, x, y, text, action):
-        hitbox = Turtle()
-        hitbox.penup()
-        hitbox.goto(x, y)
-        hitbox.shape("square")
-        hitbox.shapesize(stretch_wid=2, stretch_len=13)
-        hitbox.pensize(2)
-        hitbox.pencolor("black")
-        hitbox.fillcolor("")
-        hitbox.onclick(action)
-        button = Turtle()
-        button.hideturtle()
-        button.penup()
-        button.goto(x, y - 10)
-        button.write(text, align="center", font=("Arial", 14, "bold"))
-        button.onclick(action)
-        return button
-
-    def switch_watch(self, x, y):
-        if self.is_analog:
-            self.analog_watch.clear()
-            self.analog_watch.stop_time()
-            self.digital_watch.show_time()
-        else:
-            self.digital_watch.clear()
-            self.digital_watch.stop_time()
-            self.analog_watch.show_time()
-        self.is_analog = not self.is_analog
-
-    def exit_program(self, x, y):
-        bye()
 
 if __name__ == '__main__':
     speed(0)
     hideturtle()
     analog_watch = AnalogWatch(200)
     digital_watch = DigitalWatch()
-    buttons = Buttons(analog_watch, digital_watch)
+    timer = Timer()
+    buttons = Buttons(analog_watch, digital_watch, timer)
     analog_watch.show_time()
     mainloop()
